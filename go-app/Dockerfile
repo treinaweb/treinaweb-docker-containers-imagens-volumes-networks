@@ -1,11 +1,17 @@
-FROM golang:1.21-alpine
+FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
 COPY main.go .
 
-ENV PORT=8080
+RUN go build main.go
 
-EXPOSE ${PORT}
+FROM scratch AS runner
 
-CMD [ "go", "run", "main.go" ]
+WORKDIR /app
+
+COPY --from=builder /app/main /app
+
+EXPOSE 8080
+
+CMD [ "./main" ]
